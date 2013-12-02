@@ -16,7 +16,7 @@ class yOffer extends yComponent{
 		$generalProperties = array(
 			'url'=>'', 'buyurl'=>'', 'price'=>'', 'wprice'=>'',
 			'currencyId'=>'', 'xCategory'=>'', 'categoryId'=>array(),
-			'picture'=>'', 'delivery'=>'','name'=>'', 'deliveryIncluded'=>'',
+			'picture'=>array(), 'delivery'=>'','name'=>'', 'deliveryIncluded'=>'',
 			'orderingTime'=>'', 'aliases'=>'', 'additional'=>array(),
 			'description'=>'', 'sales_notes'=>'', 'promo'=>'',
 			'manufacturer_warranty'=>'', 'county_of_origin'=>'',
@@ -89,13 +89,15 @@ class yOffer extends yComponent{
 	}
 
 
-	protected function getProp($data){
+	protected function getProp($data, $parent_key = ''){
 		$tmp='';
 		if(is_array($data)){
 			foreach($data as $key=>$value){
 				if(is_array($value)){
-					$tmp.=$this->getProp($value);
-				}else if(strlen(trim($value))>0){
+					$tmp.=$this->getProp($value, $key);
+				} else if ($parent_key == 'picture' && strlen(trim($value))>0) {
+                    $tmp.="<picture>".YMarket::specialChars(trim($value))."</picture>\r\n";
+                } else if(strlen(trim($value))>0){
 					$tmp.="<$key>".YMarket::specialChars(trim($value))."</$key>\r\n";
 				}
 			}

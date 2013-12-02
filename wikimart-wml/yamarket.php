@@ -172,6 +172,26 @@ class yamarket extends Module
         return $id_product . '-' . $result;
     }
 
+    public static function getImages($product)
+    {
+        $pictures = array();
+        $link = new Link();
+
+        if (!$results = Db::getInstance()->ExecuteS('
+          SELECT `id_image`
+          FROM `' . _DB_PREFIX_ . 'image`
+          WHERE `id_product` = ' . intval($product['id_product']))
+        ) {
+            return false;
+        }
+
+        foreach ($results as $row) {
+            $pictures[] = $link->getImageLink($product['link_rewrite'], $product['id_product'] . '-' . $row['id_image']);
+        }
+
+        return $pictures;
+    }
+
     public static function getProducts($id_lang)
     {
         //return Product::getProducts($id_lang, 0, 100000, 'name' , 'asc');
@@ -227,8 +247,9 @@ class yamarket extends Module
             $tmp->sales_notes = $this->_settings['y_sl'];
             $tmp->url = $link->getProductLink((int)$product['id_product'], $product['link_rewrite']);
             //Картинка
-            if ($cover = self::getCover($product['id_product']))
-                $tmp->picture = $link->getImageLink($product['link_rewrite'], $cover);
+//            if ($cover = self::getCover($product['id_product']))
+//                $tmp->picture = $link->getImageLink($product['link_rewrite'], $cover);
+            $tmp->picture = self::getImages($product);
             $tmp->currencyId = ($curr_def->iso_code);
             $tmp->categoryId = $product['id_category_default'];
             //$tmp->vendorCode = $product['reference'];
